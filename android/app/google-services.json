@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "1011197581225",
+    "project_id": "resto-a6a06",
+    "storage_bucket": "resto-a6a06.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1011197581225:android:f131aa35c4e1e8774496b8",
+        "android_client_info": {
+          "package_name": "com.devloid.rento.rento"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1011197581225-7kgrbqgkd7jksjut1ui7dul3eelmcdgl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-26dK2fHObWrmh_jMP-aco3JDT5pFkTw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1011197581225-7kgrbqgkd7jksjut1ui7dul3eelmcdgl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1011197581225-j83bj4sb85k3r9lfj07sennl6t7pcqtg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.devloid.rento.rento"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1011197581225:android:40ac1fb5a4737b9d4496b8",
+        "android_client_info": {
+          "package_name": "com.example.tryriverpod"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1011197581225-7kgrbqgkd7jksjut1ui7dul3eelmcdgl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-26dK2fHObWrmh_jMP-aco3JDT5pFkTw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1011197581225-7kgrbqgkd7jksjut1ui7dul3eelmcdgl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1011197581225-j83bj4sb85k3r9lfj07sennl6t7pcqtg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.devloid.rento.rento"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,13 +6,26 @@ enum FormFieldState {
   ok,
 }
 
-class FormState {
-  final List<FormField> fields;
-
-  FormState(this.fields);
+enum FormModelStatus {
+  submitted,
+  submitting,
+  none,
 }
 
-extension ListFormField on List<FormField> {
+class FormModel {
+  final List<FormFieldItem> fields;
+  final FormModelStatus formStatus;
+
+  FormModel(
+    this.fields, {
+    this.formStatus = FormModelStatus.none,
+  });
+
+  FormModel setFormStatus(FormModelStatus status) =>
+      FormModel(fields, formStatus: status);
+}
+
+extension ListFormField on List<FormFieldItem> {
   get isAnyError => any((item) => item.fieldState == FormFieldState.error);
 
   bool get isReadyToSubmit => every((element) {
@@ -29,8 +42,9 @@ extension ListFormField on List<FormField> {
         return true;
       });
 
-  FormField getByKey(String key) => firstWhere((element) => element.key == key);
-  List<FormField> setByKey(String key, FormField value) =>
+  FormFieldItem getByKey(String key) =>
+      firstWhere((element) => element.key == key);
+  List<FormFieldItem> setByKey(String key, FormFieldItem value) =>
       [for (var e in this) e.key == key ? value : e];
 
   bool get hasMandatory => any((item) => item.isMandatory);
@@ -39,35 +53,37 @@ extension ListFormField on List<FormField> {
       };
 }
 
-class FormField<T> {
+class FormFieldItem<T> {
   final FormFieldState fieldState;
   final bool isMandatory;
   final String key;
   final T value;
   final bool enable;
   final bool Function(dynamic)? validation;
+  final T defaultValue;
 
-  FormField({
+  FormFieldItem({
     required this.key,
     this.isMandatory = false,
     required this.value,
     this.validation,
     this.fieldState = FormFieldState.loading,
     this.enable = true,
-  });
+  }) : defaultValue = value;
 
-  FormField<T> addValue(newValue) {
-    return FormField<T>(
+  FormFieldItem<T> editValue(T newValue) {
+    return FormFieldItem<T>(
       key: key,
       value: newValue,
       fieldState: fieldState,
       isMandatory: isMandatory,
       validation: validation,
+      enable: enable,
     );
   }
 
-  FormField<T> disabled() {
-    return FormField<T>(
+  FormFieldItem<T> disabled() {
+    return FormFieldItem<T>(
       key: key,
       value: value,
       fieldState: fieldState,
@@ -77,8 +93,8 @@ class FormField<T> {
     );
   }
 
-  FormField<T> enabled() {
-    return FormField<T>(
+  FormFieldItem<T> enabled() {
+    return FormFieldItem<T>(
       key: key,
       value: value,
       fieldState: fieldState,
@@ -87,12 +103,4 @@ class FormField<T> {
       enable: true,
     );
   }
-}
-
-class FormProvider extends StateNotifier<FormState> {
-  FormProvider(state) : super(state);
-
-  void fillValue(String key, value) => state = FormState(
-        [for (var e in state.fields) e.key == key ? e.addValue(value) : e],
-      );
 }

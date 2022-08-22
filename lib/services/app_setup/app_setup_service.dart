@@ -1,10 +1,27 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
+import 'package:tryriverpod/firebase_options.dart';
+import 'package:tryriverpod/providers/app_setup/app_setup_provider.dart';
 
 class AppSetupService {
+  GoogleAuthProvider googleProvider = GoogleAuthProvider();
+
   Stream<AppSetupModel> initialize() async* {
-    Hive.init(Directory.current.path);
+    if (!kIsWeb) {
+      Hive.init(Directory.current.path);
+    }
+
+    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
+    }
 
     final rent = await BoxCollection.open(
       DBCollections.rentTrx,
@@ -23,23 +40,61 @@ class AppSetupService {
       path: './',
     );
 
-    yield (AppSetupModel(
+    final setupModel = AppSetupModel(
       collection: {
         DBCollections.rentTrx: rent,
         DBCollections.counterColl: counter,
       },
-    ));
+    );
+
+    yield (setupModel);
+
+    await for (var user in FirebaseAuth.instance.authStateChanges()) {
+      yield (setupModel.copyWith(user: user));
+    }
+
+    await for (var user in FirebaseAuth.instance.idTokenChanges()) {
+      yield (setupModel.copyWith(user: user));
+    }
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    googleProvider
+        .addScope('https://www.googleapis.com/auth/contacts.readonly');
+    googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+  }
+
+  signOut() async {
+    await FirebaseAuth.instance.signOut();
   }
 }
 
 class AppSetupModel {
   final Map<String, BoxCollection> collection;
   final String? firebaseToken;
+  final User? user;
 
   AppSetupModel({
     required this.collection,
     this.firebaseToken,
+    this.user,
   });
+
+  AppSetupModel copyWith({
+    Map<String, BoxCollection>? collection,
+    String? firebaseToken,
+    User? user,
+  }) {
+    return AppSetupModel(
+      collection: collection ?? this.collection,
+      firebaseToken: firebaseToken ?? this.firebaseToken,
+      user: user ?? this.user,
+    );
+  }
 }
 
 class DBCollections {

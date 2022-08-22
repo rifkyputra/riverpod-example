@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tryriverpod/app.dart';
-import 'package:tryriverpod/screen/home.dart';
-import 'package:tryriverpod/services/app_setup/app_setup_provider.dart';
+import 'package:tryriverpod/providers/app_setup/app_setup_provider.dart';
+import 'package:tryriverpod/providers/counter/counter_provider.dart';
 import 'package:tryriverpod/services/app_setup/app_setup_service.dart';
 import 'package:mocktail/mocktail.dart';
 

@@ -2,24 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tryriverpod/providers/form/form_state.dart';
 
 final formChangeProvider =
-    StateNotifierProvider.autoDispose<FormProvider, FormState>(
+    StateNotifierProvider.autoDispose<FormProvider, FormModel>(
   (ref) => FormProvider(
-    FormState([
-      FormField<String?>(
+    FormModel([
+      FormFieldItem<String?>(
         key: 'title',
         value: null,
         isMandatory: true,
         validation: (s) => s?.isNotEmpty ?? false,
       ),
-      FormField<String?>(
+      FormFieldItem<String?>(
         key: 'description',
         value: null,
       ),
-      FormField<String?>(
+      FormFieldItem<String?>(
         key: 'nickname',
         value: null,
       ),
-      FormField<String?>(
+      FormFieldItem<String?>(
         key: 'nominal',
         value: null,
         isMandatory: true,
@@ -28,7 +28,7 @@ final formChangeProvider =
     ]),
   ),
 );
-final formProvider = StateNotifierProvider.autoDispose<FormProvider, FormState>(
+final formProvider = StateNotifierProvider.autoDispose<FormProvider, FormModel>(
   (ref) {
     var form = ref.watch(formChangeProvider).fields;
 
@@ -57,12 +57,12 @@ final formProvider = StateNotifierProvider.autoDispose<FormProvider, FormState>(
               : nominal.enabled(),
         );
 
-    return FormProvider(FormState(form));
+    return FormProvider(FormModel(form));
   },
 );
 
-final checkField = StateProvider.autoDispose<FormField>(
-    (ref) => FormField(key: 'agree', value: false));
+final checkField = StateProvider.autoDispose<FormFieldItem>(
+    (ref) => FormFieldItem(key: 'agree', value: false));
 
 final enabledProvider = StateProvider.autoDispose<bool>((ref) {
   final hasAgree = ref.watch(checkField).value == true;
@@ -72,3 +72,15 @@ final enabledProvider = StateProvider.autoDispose<bool>((ref) {
 
   return false;
 });
+
+class FormProvider extends StateNotifier<FormModel> {
+  FormProvider(state) : super(state);
+
+  void fillValue(String key, value) => state = FormModel(
+        [for (var e in state.fields) e.key == key ? e.editValue(value) : e],
+      );
+
+  void resetValues() => state = FormModel(
+        [for (var e in state.fields) e.editValue(e.defaultValue)],
+      );
+}

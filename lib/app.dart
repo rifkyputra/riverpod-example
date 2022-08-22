@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tryriverpod/screen/home.dart';
-import 'package:tryriverpod/services/app_setup/app_setup_provider.dart';
+import 'package:tryriverpod/providers/app_setup/app_setup_provider.dart';
 
 class RootApp extends StatelessWidget {
   const RootApp({Key? key}) : super(key: key);
@@ -16,8 +16,8 @@ class RootApp extends StatelessWidget {
             body: Builder(
               builder: (context) {
                 return ref.watch(appSetupProvider).when<Widget>(
-                      data: (data) => const HomePage(),
-                      error: (error, _) => const ErrorSetup(),
+                      data: (_) => const HomePage(),
+                      error: (_, __) => const ErrorSetup(),
                       loading: () => const LoadingSplash(),
                     );
               },
