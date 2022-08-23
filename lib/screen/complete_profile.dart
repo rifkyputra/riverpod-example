@@ -40,10 +40,6 @@ final completeProfileForm =
         fields.setByKey('email', fields.getByKey('email').editValue(email));
   }
 
-  fields.forEach(
-    (element) => print(element.value),
-  );
-
   return CompleteProfileFormProvider(FormModel(fields));
 });
 
@@ -83,59 +79,64 @@ class CompleteProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 18.0),
         child: Column(
           children: [
-            Consumer(builder: (context, ref, _) {
-              if (ref.watch(completeProfileForm).formStatus ==
-                  FormModelStatus.submitted) {
-                Navigator.of(context).pop();
-              }
-              final String email =
-                  ref.watch(completeProfileForm).fields.getByKey('email').value;
+            Consumer(
+              builder: (context, ref, _) {
+                if (ref.watch(completeProfileForm).formStatus ==
+                    FormModelStatus.submitted) {
+                  Navigator.of(context).pop();
+                }
+                final String email = ref
+                    .watch(completeProfileForm)
+                    .fields
+                    .getByKey('email')
+                    .value;
 
-              return Form(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 12),
-                      const Text('email'),
-                      EnabledWidget(
-                        enable: email.isEmpty,
-                        child: TextFormField(
-                          initialValue: email,
+                return Form(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        const Text('email'),
+                        EnabledWidget(
+                          enable: email.isEmpty,
+                          child: TextFormField(
+                            initialValue: email,
+                            onChanged: (v) => ref
+                                .read(
+                                    completeProfileFormChangerProvider.notifier)
+                                .fillValue('email', v),
+                          ),
+                        ),
+                        const SizedBox(height: 22),
+                        const Text('name'),
+                        TextFormField(
                           onChanged: (v) => ref
                               .read(completeProfileFormChangerProvider.notifier)
-                              .fillValue('email', v),
+                              .fillValue('name', v),
                         ),
-                      ),
-                      const SizedBox(height: 22),
-                      const Text('name'),
-                      TextFormField(
-                        onChanged: (v) => ref
-                            .read(completeProfileFormChangerProvider.notifier)
-                            .fillValue('name', v),
-                      ),
-                      const SizedBox(height: 22),
-                      const Text('phone'),
-                      TextFormField(
-                        onChanged: (v) => ref
-                            .read(completeProfileFormChangerProvider.notifier)
-                            .fillValue('phone', v),
-                      ),
-                      const SizedBox(height: 32),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            print(ref.read(completeProfileForm).fields.values);
-                            ref
-                                .read(completeProfileForm.notifier)
-                                .saveToFirestore();
-                          },
-                          child: const Text('Save'),
+                        const SizedBox(height: 22),
+                        const Text('phone'),
+                        TextFormField(
+                          onChanged: (v) => ref
+                              .read(completeProfileFormChangerProvider.notifier)
+                              .fillValue('phone', v),
                         ),
-                      ),
-                    ]),
-              );
-            })
+                        const SizedBox(height: 32),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              ref
+                                  .read(completeProfileForm.notifier)
+                                  .saveToFirestore();
+                            },
+                            child: const Text('Save'),
+                          ),
+                        ),
+                      ]),
+                );
+              },
+            )
           ],
         ),
       ),

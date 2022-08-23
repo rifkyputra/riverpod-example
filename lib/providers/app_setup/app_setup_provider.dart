@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod/riverpod.dart';
-import 'package:stream_transform/stream_transform.dart';
 import 'package:tryriverpod/services/app_setup/app_setup_service.dart';
 
 final appSetupServiceProvider = Provider(

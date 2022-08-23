@@ -1,7 +1,9 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tryriverpod/screen/home.dart';
 import 'package:tryriverpod/providers/app_setup/app_setup_provider.dart';
+
 
 class RootApp extends StatelessWidget {
   const RootApp({Key? key}) : super(key: key);
