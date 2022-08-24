@@ -19,21 +19,27 @@ class AppSetupService {
   GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
   Stream<AppSetupModel> initialize() async* {
+    // final directory = await getTemporaryDirectory();
+    // Hive.init(directory.path);
+    String path = './';
     if (!kIsWeb) {
-      await Permission.storage.request();
-      await Permission.manageExternalStorage.request();
-      // final directory = await getTemporaryDirectory();
-      // Hive.init(directory.path);
       Directory appDocDirectory = await getApplicationDocumentsDirectory();
 
-      await Directory(appDocDirectory.path + '/' + 'hive')
-          .create(recursive: true)
-// The created directory is returned as a Future.
-          .then((Directory directory) {
-        print('Path of New Dir: ' + directory.path);
-      });
+      await Permission.storage.request();
+      await Permission.manageExternalStorage.request();
 
-      await Hive.initFlutter();
+      await Directory(appDocDirectory.path + '/' + 'hive')
+          .create(recursive: true);
+
+      await Hive.initFlutter('hive');
+
+      path = appDocDirectory.path + '/hive';
+
+      try {
+        final platformVersion = await ArFlutterPlugin.platformVersion;
+      } on PlatformException {
+        print('------------->platfor exception');
+      }
     }
 
     if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
@@ -41,36 +47,29 @@ class AppSetupService {
           options: DefaultFirebaseOptions.currentPlatform);
     }
 
-    // final rent = await BoxCollection.open(
-    //   DBCollections.rentTrx,
-    //   {
-    //     DBBoxes.lendList,
-    //     DBBoxes.borrowList,
-    //   },
-    //   path: 'hive',
-    // );
+    final rent = await BoxCollection.open(
+      DBCollections.rentTrx,
+      {
+        DBBoxes.lendList,
+        DBBoxes.borrowList,
+      },
+      path: path,
+    );
 
-    // final counter = await BoxCollection.open(
-    //   DBCollections.counterColl,
-    //   {
-    //     DBBoxes.intCounter,
-    //   },
-    //   path: 'hive',
-    // );
+    final counter = await BoxCollection.open(
+      DBCollections.counterColl,
+      {
+        DBBoxes.intCounter,
+      },
+      path: path,
+    );
 
     final setupModel = AppSetupModel(
       collection: {
-        // DBCollections.rentTrx: rent,
-        // DBCollections.counterColl: counter,
+        DBCollections.rentTrx: rent,
+        DBCollections.counterColl: counter,
       },
     );
-
-    try {
-      final platformVersion = await ArFlutterPlugin.platformVersion;
-      print('---------> ver : $platformVersion');
-    } on PlatformException {
-      print('------------->platfor exception');
-    }
 
     yield (setupModel);
 
