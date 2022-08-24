@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tryriverpod/screen/home.dart';
@@ -12,6 +13,8 @@ class RootApp extends StatelessWidget {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Consumer(builder: (context, ref, _) {
         return MaterialApp(
+          builder: BotToastInit(),
+          navigatorObservers: [BotToastNavigatorObserver()],
           home: Scaffold(
             body: SafeArea(
               child: Builder(

@@ -72,24 +72,47 @@ class AppSetupService {
     );
 
     yield (setupModel);
+  }
 
+  Stream<User?> listenAuth() async* {
     await for (var user in FirebaseAuth.instance.authStateChanges()) {
-      yield (setupModel.copyWith(user: user));
+      yield (user);
     }
 
     await for (var user in FirebaseAuth.instance.idTokenChanges()) {
-      yield (setupModel.copyWith(user: user));
+      yield (user);
     }
   }
 
-  Future<UserCredential> signInWithGoogle() async {
-    // Trigger the authentication flow
-    googleProvider
-        .addScope('https://www.googleapis.com/auth/contacts.readonly');
-    googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
+  Future<UserCredential?> signInWithGoogle() async {
+    if (kIsWeb) {
+      // Trigger the authentication flow
+      googleProvider
+          .addScope('https://www.googleapis.com/auth/contacts.readonly');
+      googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
 
-    // Once signed in, return the UserCredential
-    return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      // Once signed in, return the UserCredential
+      return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+    }
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      // Once signed in, return the UserCredential
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (s) {
+      print(s);
+    }
   }
 
   signOut() async {
@@ -116,7 +139,15 @@ class AppSetupModel {
     return AppSetupModel(
       collection: collection ?? this.collection,
       firebaseToken: firebaseToken ?? this.firebaseToken,
-      user: user ?? this.user,
+      user: user,
+    );
+  }
+
+  AppSetupModel merge(AppSetupModel setupModel) {
+    return AppSetupModel(
+      collection: collection..addAll(setupModel.collection),
+      firebaseToken: setupModel.firebaseToken ?? firebaseToken,
+      user: setupModel.user ?? user,
     );
   }
 }

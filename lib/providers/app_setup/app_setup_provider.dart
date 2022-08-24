@@ -10,14 +10,32 @@ final googleProvider = Provider(
   (ref) => GoogleAuthProvider(),
 );
 
+final appSetupModelProvider = Provider(
+  (ref) => AppSetupModel(collection: {}),
+);
+
 final appSetupProvider = StreamProvider<AppSetupModel>((ref) async* {
   // watch for firebase config changes
   // watch for auth changes
 
   final appService = ref.watch(appSetupServiceProvider).initialize();
+  final auth = ref.watch(appSetupServiceProvider).listenAuth();
+  AppSetupModel? appSetupModel = ref.state.asData?.value;
 
   await for (AppSetupModel model in appService) {
-    yield (model);
+    appSetupModel = appSetupModel?.merge(model) ?? model;
+    yield (appSetupModel);
+  }
+
+  await for (User? user in auth) {
+    appSetupModel = appSetupModel?.copyWith(user: user) ??
+        AppSetupModel(
+          collection: {},
+          user: user,
+        );
+
+    print('------->>> ${appSetupModel.user?.email}');
+    yield (appSetupModel);
   }
 });
 
